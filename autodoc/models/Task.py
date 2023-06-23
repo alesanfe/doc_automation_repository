@@ -1,19 +1,20 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 
 
+@dataclass
 class Task:
-    def __init__(self, user_id, task_id, description, start_date, end_date, duration) -> Task:
-        self.user_id = user_id
-        self.task_id = task_id
-        self.description = description
-        self.start_date = start_date
-        self.end_date = end_date
-        self.duration = duration
+    user_id: str
+    task_id: str
+    description: str
+    start_date: str
+    end_date: str
+    duration: str
 
-    @staticmethod
-    def create(task_json: json):
-        return Task(task_json['userId'], task_json['id'], task_json['description'],
-                    task_json['timeInterval']['start'], task_json['timeInterval']['end'],
-                    task_json['timeInterval']['duration'])
+    @classmethod
+    def create(cls, task_json: json) -> 'Task':
+        return cls(task_json['userId'], task_json['id'], task_json['description'],
+                   task_json['timeInterval']['start'], task_json['timeInterval']['end'],
+                   task_json['timeInterval']['duration'])

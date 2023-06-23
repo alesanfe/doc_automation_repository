@@ -1,36 +1,24 @@
 from __future__ import annotations
+
+from dataclasses import dataclass
 from typing import List
-import json
 
 
+@dataclass
 class Issue:
-    def __init__(self,
-                 number: int,
-                 user: str,
-                 title: str,
-                 body: str,
-                 labels: List[str],
-                 state: str,
-                 assignees: List[str],
-                 created_at: str,
-                 updated_at: str,
-                 closed_at: str) -> None:
-        self.number = number
-        self.user = user
-        self.title = title
-        self.body = body
-        self.labels = labels
-        self.state = state
-        self.assignees = assignees
-        self.created_at = created_at
-        self.updated_at = updated_at
-        self.closed_at = closed_at
+    number: int
+    user: str
+    title: str
+    body: str
+    labels: List[str]
+    state: str
+    assignees: List[str]
+    created_at: str
+    updated_at: str
+    closed_at: str
 
-    def __str__(self):
-        return f"{self.number}-{self.title}"
-
-    @staticmethod
-    def create(issue_json: json) -> Issue:
+    @classmethod
+    def create(cls, issue_json: dict) -> 'Issue':
         number = issue_json['number']
         user = issue_json['user']['login']
         title = issue_json['title']
@@ -41,17 +29,11 @@ class Issue:
         created_at = issue_json['created_at']
         updated_at = issue_json['updated_at']
         closed_at = issue_json['closed_at']
-        return Issue(number,
-                     user,
-                     title,
-                     body,
-                     labels,
-                     state,
-                     assignees,
-                     created_at,
-                     updated_at,
-                     closed_at)
+        return cls(number, user, title, body, labels, state, assignees, created_at, updated_at, closed_at)
 
-    @staticmethod
-    def create_issues(issues_json: json) -> List[Issue]:
-        return [Issue.create(i) for i in issues_json]
+    @classmethod
+    def create_issues(cls, issues_json: list) -> List['Issue']:
+        return [cls.create(i) for i in issues_json]
+
+    def __str__(self) -> str:
+        return f"{self.number}-{self.title}"

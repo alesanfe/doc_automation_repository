@@ -1,7 +1,12 @@
 import requests
 
-from autodoc import *
+import os
+
+
 from clockipy.Clockipy import Clockipy
+from github import Github, Auth
+from autodoc.managers.repository_manager import RepositoryManager
+from autodoc.managers.clockify_manager import ClockifyManager
 
 
 def create_directories() -> str:
@@ -24,23 +29,19 @@ def create_directories() -> str:
 
 
 def main():
-    repository_url = input('Enter the repository URL:\n')
-    clockipy_ws = input("Enter the clockify's workspace name:\n")
-    clockify_url = 'https://api.clockify.me/api/v1/workspaces'
+    owner = input("Enter the owner's name:\n")
+    repository = "TODOlist-API2" # input('Enter the repository:\n')
+    clockipy_ws = "TODOlist-API2" # input("Enter the clockify's workspace name:\n")
+    full_name = owner + "/" + repository
     data_path = create_directories()
     # Api-Key Configuration
     with open(r".\autodoc\token.txt", "r") as token_file:
         line = token_file.readline()
-        api_keys = line.split(";")
+        github_key, clokify_key = line.split(";")
     try:
-        octokit = Octokit(api_keys[0])
-        clockipy = Clockipy(api_keys[1])
-
-        repository = get_repository(octokit, repository_url)
+        repository = RepositoryManager(github_key, full_name).get_repository()
         print(repository)
-
-        clockify_report = get_clockify(clockipy, clockify_url, clockipy_ws, repository)
-        print(clockify_report)
+        clockify_report = ClockifyManager(clokify_key, clockipy_ws, repository).get_clockify()
 
         # templates_path = os.getcwd() + '/templates/'
         # template_name = 'repository_test_template.txt'

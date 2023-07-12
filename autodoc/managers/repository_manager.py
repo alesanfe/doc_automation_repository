@@ -1,41 +1,33 @@
-from dataclasses import dataclass
-from typing import List
 
-from autodoc import Repository, Commit, Issue, Contributor
+
+from attr import define, field
+
+from autodoc.models import Repository, Commit, Issue, Contributor
 from autodoc.managers.api_manager import APIManager
+from github import Github, Auth
 
-GITHUB_API_HEADERS = {"accept": "application/vnd.github+json"}
-DEFAULT_URL_OPTIONS = {"front_path": "", "back_path": ""}
-
-@dataclass
+@define
 class RepositoryManager:
-    octokit: Octokit
+    token: str = field()
     url: str
+    github: Github = field(init=False)
+    repository: Repository = field(init=False)
+
+    @token.validator
+    def check_token(self, attribute, value):
+        if not value:
+            raise ValueError("Token is required")
+        if not isinstance(value, str):
+            raise ValueError("Token must be a string")
+        #if not value.startswith("ghp_"):
+        #    raise ValueError("Token must start with ghp_")
+        #if len(value) != 40:
+        #    raise ValueError("Token must have 40 characters")
+
+    def __attrs_post_init__(self):
+        auth = Auth.Token(self.token)
+        self.github = Github(auth=auth)
 
     def get_repository(self) -> Repository:
-        url_options = {"front_path": "/repos", "back_path": ""}
-        repository_json = APIManager.api_call(self.octokit, self.url, GITHUB_API_HEADERS, url_options)
-        repository = Repository.create(repository_json)
+        return self.github.get_repo(self.url)
 
-        contributors_url = repository_json['contributors_url']
-        repository.contributors = RepositoryManager.get_contributors(self.octokit, contributors_url)
-
-        commits_url = repository_json['commits_url']
-        repository.commits = RepositoryManager.get_commits(self.octokit, commits_url)
-
-        issues_url = repository_json['issues_url']
-        repository.issues = RepositoryManager.get_issues(self.octokit, issues_url)
-
-        return repository
-
-    def get_contributors(self) -> List[Contributor]:
-        contributors_json = APIManager.api_call(self.octokit, self.url, GITHUB_API_HEADERS, DEFAULT_URL_OPTIONS)
-        return Contributor.create_contributors(contributors_json)
-
-    def get_commits(self) -> List[Commit]:
-        commits_json = APIManager.api_call(self.octokit, self.url, GITHUB_API_HEADERS, DEFAULT_URL_OPTIONS)
-        return Commit.create_commits(commits_json)
-
-    def get_issues(self) -> List[Issue]:
-        issues_json = APIManager.api_call(self.octokit, self.url, GITHUB_API_HEADERS, DEFAULT_URL_OPTIONS)
-        return Issue.create_issues(issues_json)

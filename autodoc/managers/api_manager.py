@@ -1,23 +1,14 @@
 from typing import List, Dict
-from octokit import Octokit
-from typing import List, Dict
 
-from octokit import Octokit
+import requests as requests
+from github import Github
 
 
 class APIManager:
     @staticmethod
-    def api_call(api_interface, url: str, req_options: Dict[str, str], url_options: Dict[str, str]) -> List[Dict[str, str]]:
-        keyword = "github.com" if isinstance(api_interface, Octokit) else "api.clockify.me/api/v1"
-        method = "POST" if url_options.get("report") else "GET"
-        full_url = APIManager.construct_url(keyword, url, url_options)
-        response = requests.request(method, full_url, headers=req_options.get("headers"))
+    def api_call(url: str) -> List[Dict[str, str]]:
+        print(url)
+        response = requests.request("GET", url)
         data = response.json()
+        print(data)
         return data
-
-    @staticmethod
-    def construct_url(keyword: str, url: str, options: Dict[str, str]) -> str:
-        initial_index = url.rfind(keyword) + len(keyword)
-        final_index = url.rfind("{") if "{" in url else None
-        basic_url = url[initial_index: final_index]
-        return f"{options.get('front_path')}{basic_url}{options.get('back_path')}"

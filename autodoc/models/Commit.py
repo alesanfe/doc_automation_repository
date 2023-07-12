@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import List
 
+from attr import define
 
-@dataclass
+
+@define
 class Commit:
     sha: str
     author: str

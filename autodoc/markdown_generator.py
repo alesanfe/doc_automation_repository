@@ -2,8 +2,7 @@ import os
 from dataclasses import dataclass
 from typing import List
 
-from autodoc import Issue
-from autodoc.models import Repository
+from github.Repository import Repository
 
 
 @dataclass

@@ -37,7 +37,7 @@ def main():
     owner = "alesanfe"
     repository = "TODOlist-API2"
     clockipy_ws = "TODOlist-API2"
-    github_key = "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"
+    github_key = "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"
     clokify_key = "OGViNzFhMjMtOWVkZS00NWU2LWE2ZjUtYmU4ZmM1MThkYzUy"
     full_name = owner + "/" + repository
     data_path = create_directories()

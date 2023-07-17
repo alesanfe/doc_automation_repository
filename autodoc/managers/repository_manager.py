@@ -3,7 +3,6 @@
 from attr import define, field
 from github.Repository import Repository
 
-from autodoc.managers.api_manager import APIManager
 from github import Github, Auth
 
 @define
